@@ -11,7 +11,7 @@ while True:
         break
 
     with sync_playwright() as pw:
-        contexto = pw.chromium.launch_persistent_context(user_data_dir="./perfil",headless=False,args=["--start-maximized"],no_viewport=True)
+        contexto = pw.chromium.launch_persistent_context(user_data_dir=r"C:\Users\Educação\AppData\Local\Google\Chrome\User Data",channel="chrome",headless=False,args=["--start-maximized"],no_viewport=True)
         pagina = contexto.pages[0]
 
         if "youtube" in comando:
