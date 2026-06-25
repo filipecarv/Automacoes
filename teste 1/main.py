@@ -1,33 +1,31 @@
-#esse codigo e para automatizar o navegador usando o python
 from playwright.sync_api import sync_playwright
-import time
+from urllib.parse import quote
+#esse codigo e para automatizar o navegador usando o python
 
-with sync_playwright() as pw:
-    navegador = pw.chromium.launch(headless=False)
-    contexto = navegador.new_context()
 
-    #abre o navegador
-    pagina = contexto.new_page()
+print("eae meu mano, Filipe!")
 
-    #navegar para a pagina do google
-    pagina.goto("https://www.google.com")
+while True:
+    comando = input("\no que tem de bom pra fazer hoje meu parceiro ? (Digite 'sair' para fechar!)\n> ").lower()
 
-    #pegar informações da pagina
-    print(pagina.title())
+    if comando == "sair":
+        break
 
-    #selecionar elemento na tela
-    botao = pagina.get_by_role("combobox", name="Pesquisar")
-    botao.fill(input("Digite o que deseja pesquisar:"))
-    botao.press("Enter")
+    with sync_playwright() as pw:
+        contexto = pw.chromium.launch_persistent_context(user_data_dir="./perfil",headless=False,args=["--start-maximized"],no_viewport=True)
+        pagina = contexto.pages[0]
 
-    #Nao sou um robo
-    pagina.get_by_role("button", name="Não sou um robô").click()
-    pagina.get_by_role("button", name="Enviar").click()
-    print(pagina.title())
+        if "youtube" in comando:
+            pesquisa = comando.replace("youtube", "").strip()
+            pagina.goto(
+                f"https://www.youtube.com/results?search_query={quote(pesquisa)}"
+            )
+        else:
+            pagina.goto(
+                f"https://www.google.com/search?q={quote(comando)}"
+            )
 
-    #Clicar no primeiro link da pesquisa
-    pagina.get_by_role("link", name="Python.org").click()
-    print(pagina.title())
+        print("Pronto meu parceiro!")
 
-    time.sleep(5)
-    navegador.close()
+        input("Pressione 'Enter' para continuar meu mano...")
+        contexto.close()
