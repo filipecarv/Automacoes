@@ -7,7 +7,7 @@ import pyttsx3
 engine = pyttsx3.init()
 
 def falar(texto):
-    print("Assistente:", texto)
+    print("Parceira:", texto)
     engine.say(texto)
     engine.runAndWait()
 
@@ -15,7 +15,7 @@ def ouvir():
     recognizer = sr.Recognizer()
 
     with sr.Microphone() as source:
-        print("Estou ouvindo...")
+        print("Estou escutando meu mano...")
         recognizer.adjust_for_ambient_noise(source)
         audio = recognizer.listen(source)
 
@@ -25,56 +25,43 @@ def ouvir():
         return texto.lower()
 
     except sr.UnknownValueError:
-        falar("Não entendi o que você disse.")
+        falar("Não entendi o que você disse meu parceiro.")
         return ""
 
     except Exception as erro:
         print(erro)
         return ""
 
-falar("Olá Filipe. O que você quer fazer hoje?")
+falar("Eae meu mano Filipe. O que tem de bom pra fazer hoje meu parceiro?")
 
 comando = ouvir()
 
 if comando:
 
     with sync_playwright() as pw:
-        navegador = pw.chromium.launch(headless=False)
-        pagina = navegador.new_page()
 
+        contexto = pw.chromium.launch_persistent_context(user_data_dir="./perfil",headless=False,args=["--start-maximized"],no_viewport=True)
+        pagina = contexto.pages[0] if contexto.pages else contexto.new_page()
+
+        #Pagina do Youtube
         if "youtube" in comando:
             pesquisa = comando.replace("youtube", "").strip()
 
-            falar(f"Pesquisando {pesquisa} no YouTube")
+            falar(f"Pesquisando {pesquisa} no YouTube meu mano")
 
             pagina.goto(
                 f"https://www.youtube.com/results?search_query={quote(pesquisa)}"
             )
 
-        elif "spotify" in comando:
-            pesquisa = comando.replace("spotify", "").strip()
-
-            falar(f"Abrindo Spotify e pesquisando {pesquisa}")
-
-            pagina.goto(
-                f"https://open.spotify.com/search/{quote(pesquisa)}"
-            )
-
-        elif "google" in comando:
+        #Pagina Padrão
+        else:
             pesquisa = comando.replace("google", "").strip()
 
-            falar(f"Pesquisando {pesquisa} no Google")
+            falar(f"Pesquisando {pesquisa} no Google meu mano")
 
             pagina.goto(
                 f"https://www.google.com/search?q={quote(pesquisa)}"
             )
 
-        else:
-            falar("Vou pesquisar isso no Google.")
-
-            pagina.goto(
-                f"https://www.google.com/search?q={quote(comando)}"
-            )
-
-        input("Pressione ENTER para fechar...")
-        navegador.close()
+        input("Pressione ENTER para fechar meu parceiro...")
+        contexto.close()
